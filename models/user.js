@@ -19,7 +19,13 @@ const userModel = schema({
     required:true,
     min:5,
     max:56
-  }
+  },
+  posts:[
+    {
+      type:Schema.Types.ObjectId,
+      ref:'Posts'
+    }
+  ]
 });
 
 module.exports = mongoose.model('User', userModel);

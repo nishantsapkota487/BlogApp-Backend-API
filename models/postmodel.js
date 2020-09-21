@@ -12,18 +12,23 @@ const posts = schema({
   },
   comment:[
     {
-      type:Schema.Types.ObjectId,
-      ref:'Comments'
+      type:schema.Types.ObjectId,
+      ref:'Comments',
+      required:false
     }
   ],
   createdTime:{
     type:Date,
-    default:Data.now
+    default:Date.now
   },
   creator:{
-    type:Schema.Types.ObjectId,
-    ref:'User',
-    required:true
+    type:String,
+    required:true,
+    default:'Nishant'
+  },
+  likes:{
+    type:Number,
+    required:false
   }
 });
 

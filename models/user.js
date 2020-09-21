@@ -22,7 +22,7 @@ const userModel = schema({
   },
   posts:[
     {
-      type:Schema.Types.ObjectId,
+      type:schema.Types.ObjectId,
       ref:'Posts'
     }
   ]

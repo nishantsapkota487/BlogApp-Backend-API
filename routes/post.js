@@ -72,4 +72,31 @@ router.delete('/delete/:id', async (req, res)=>{
   }
 });
 
+// This is not complete
+router.patch('/like/:id', async (req, res)=>{
+  try{
+    const id = req.params.id;
+    const post = await postModel.findOne({
+      _id:id
+    });
+    if (!post) {
+      return res.json({
+        message:'Something went wrongee'
+      })
+    }
+    const updatedPost = await postModel.findOneAndUpdate(
+      {_id:id},
+      {$inc:
+        {likes:1}},
+      {returnNewDocument:true}
+    )
+    return res.status(200).json({
+      message:updatedPost
+    })
+  }catch(err){
+    return res.status(404).json({
+      message:err
+    })
+  }
+});
 module.exports = router;

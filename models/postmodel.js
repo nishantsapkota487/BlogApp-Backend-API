@@ -28,7 +28,6 @@ const posts = schema({
   },
   likes:{
     type:Number,
-    required:false
   }
 });
 

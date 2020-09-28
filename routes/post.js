@@ -1,6 +1,9 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const postModel = require('../models/postmodel');
 const router = express.Router();
+
+mongoose.set('useFindAndModify', false);
 
 router.post('/create', async (req, res)=>{
   const title = req.body.title;
@@ -69,6 +72,31 @@ router.delete('/delete/:id', async (req, res)=>{
     return res.status(404).json({
       messag:err
     })
+  }
+});
+
+router.patch('/like/:id', async (req, res) => {
+  try{
+    const id = req.params.id;
+    const likedPost = await postModel.findOneAndUpdate(
+      {_id:id},
+      {$inc:{
+        likes:1
+      }},
+      {returnNewDocument:true}
+    );
+    if (likedPost) {
+      return res.status(200).json({
+        message:likedPost
+      });
+    }
+    return res.status(200).json({
+      message:'Something went wrong'
+    });
+  }catch(err){
+    return res.status(200).json({
+      message:'Something went wrong'
+    });
   }
 });
 

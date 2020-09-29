@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const schema = mongoose.Schema;
-const commments = schema({
+const comments = schema({
   comment:{
     type:String,
     max:128,

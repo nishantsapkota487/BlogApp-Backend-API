@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const postModel = require('../models/postmodel');
+const commentModel = require('../models/comment');
 const router = express.Router();
 
 mongoose.set('useFindAndModify', false);
@@ -123,6 +124,38 @@ router.patch('/dislike/:id', async (req, res) =>{
     return res.status(400).json({
       message:'Something went wrong'
     })
+  }
+});
+
+router.post('/comment/:postid', async (req, res) =>{
+  try{
+    const postId = req.params.postid;
+    const comment = new commentModel({
+      comment:req.body.comment
+    });
+    const savedComment = await comment.save();
+    if (!savedComment) {
+      return res.status(400).json({
+        message:'Something went wrong'
+      })
+    }
+    const post = await postModel.findOneAndUpdate(
+      {_id:postId},
+      {$push:
+        {comment:comment}}
+    );
+    if (!post) {
+      return res.status(400).json({
+        message: 'Something went wrong'
+      });
+    }
+    return res.status(200).json({
+      message:post
+    });
+  }catch(err){
+    return res.status(400).json({
+      message:err
+    });
   }
 });
 

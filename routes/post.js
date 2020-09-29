@@ -1,6 +1,9 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const postModel = require('../models/postmodel');
 const router = express.Router();
+
+mongoose.set('useFindAndModify', false);
 
 router.post('/create', async (req, res)=>{
   const title = req.body.title;
@@ -8,7 +11,8 @@ router.post('/create', async (req, res)=>{
   const post = new postModel({
     title:title,
     content:content,
-    likes:0
+    likes:0,
+    dislikes:0
   });
   try{
     const savedPost = await post.save()
@@ -94,6 +98,31 @@ router.patch('/like/:id', async (req, res) => {
     return res.status(200).json({
       message:'Something went wrong'
     });
+  }
+});
+
+router.patch('/dislike/:id', async (req, res) =>{
+  try{
+    const id = req.params.id;
+    const dislikedPost = await postModel.findOneAndUpdate(
+      {_id:id},
+      {$inc:
+        {dislikes:1}},
+      {returnNewDocument:true}
+    )
+    if (dislikedPost) {
+      return res.status(200).json({
+        message:dislikedPost
+      })
+    }
+    return res.status(400).json({
+      message:'something went wrong'
+    })
+  }catch(err){
+    console.log(err);
+    return res.status(400).json({
+      message:'Something went wrong'
+    })
   }
 });
 

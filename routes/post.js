@@ -5,7 +5,8 @@ const commentModel = require('../models/comment');
 const router = express.Router();
 
 mongoose.set('useFindAndModify', false);
-
+// this endpoint is for creating
+// the post
 router.post('/create', async (req, res)=>{
   const title = req.body.title;
   const content = req.body.content;
@@ -19,7 +20,7 @@ router.post('/create', async (req, res)=>{
     const savedPost = await post.save()
     if (savedPost) {
       return res.status(200).json({
-        mesage:savedPost
+        message:savedPost
       })
     }
   }
@@ -33,6 +34,8 @@ router.post('/create', async (req, res)=>{
   }
 });
 
+// this endpoint is for retrieving all the
+// posts created by the user
 router.get('/posts', async (req, res) =>{
   try{
     const posts = await postModel.find({});
@@ -53,12 +56,28 @@ router.get('/posts', async (req, res) =>{
   }
 });
 
+// this endpoint is for deleting a particular
+// post of the user
 router.delete('/delete/:id', async (req, res)=>{
   const id = req.params.id;
   try{
     const post = await postModel.find({
       _id:id
     });
+    const comments = post[0].comment
+    console.log(comments);
+    const deleteComment = async comments =>{
+      try{
+        for (var i = 0; i < comments.length; i++) {
+          const comment = await commentModel.findOne({_id:comments[i]})
+          console.log(comment);
+          comment.delete()
+        }
+      }catch(err){
+        return res.json({message:'Something went wrong'})
+      }
+    }
+    deleteComment(comments);
     const deletePost = post[0].delete();
     if (deletePost) {
       return res.status(200).json({
@@ -77,6 +96,7 @@ router.delete('/delete/:id', async (req, res)=>{
   }
 });
 
+// this endpoint is for liking the post
 router.patch('/like/:id', async (req, res) => {
   try{
     const id = req.params.id;
@@ -102,6 +122,7 @@ router.patch('/like/:id', async (req, res) => {
   }
 });
 
+// this endpoint is for disliking the post
 router.patch('/dislike/:id', async (req, res) =>{
   try{
     const id = req.params.id;
@@ -127,6 +148,8 @@ router.patch('/dislike/:id', async (req, res) =>{
   }
 });
 
+// this endpoint is for commenting on a
+// partricular post by the user
 router.post('/comment/:postid', async (req, res) =>{
   try{
     const postId = req.params.postid;

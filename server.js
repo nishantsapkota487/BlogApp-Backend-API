@@ -1,8 +1,9 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-const router = require('./routes/post');
-const userSchema = require('./models/User');
+const postRouter = require('./routes/post');
+const userRouter = require('./routes/AppUser');
+const userSchema = require('./models/user');
 
 const app = express();
 dotenv.config();
@@ -20,4 +21,5 @@ mongoose.connect(process.env.DB_CONNECT,
   console.log('DB Connected');
 });
 
-app.use('/api', router);
+app.use('/api/blogs', postRouter);
+app.use('/api/user', userRouter);

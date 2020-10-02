@@ -65,7 +65,9 @@ router.delete('/delete/:id', async (req, res)=>{
       _id:id
     });
     const comments = post[0].comment
-    console.log(comments);
+    // this function is to delete all the
+    // comments of the post which is going to be
+    // deleted
     const deleteComment = async comments =>{
       try{
         for (var i = 0; i < comments.length; i++) {

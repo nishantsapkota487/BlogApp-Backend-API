@@ -44,10 +44,10 @@ router.post('/create',verifyToken, async (req, res)=>{
 });
 
 // this endpoint is for retrieving all the
-// posts created by the user
+// posts created by all the users
 router.get('/posts',verifyToken, async (req, res) =>{
   try{
-    const posts = await postModel.find({_id:req.user._id});
+    const posts = await postModel.find({});
     if (posts) {
       return res.status(200).json({
         message:posts
@@ -67,7 +67,7 @@ router.get('/posts',verifyToken, async (req, res) =>{
 
 // this endpoint is for deleting a particular
 // post of the user
-router.delete('/delete/:id', async (req, res)=>{
+router.delete('/delete/:id',verifyToken, async (req, res)=>{
   const id = req.params.id;
   try{
     const post = await postModel.find({
@@ -108,7 +108,7 @@ router.delete('/delete/:id', async (req, res)=>{
 });
 
 // this endpoint is for liking the post
-router.patch('/like/:id', async (req, res) => {
+router.patch('/like/:id',verifyToken, async (req, res) => {
   try{
     const id = req.params.id;
     const likedPost = await postModel.findOneAndUpdate(
@@ -134,7 +134,7 @@ router.patch('/like/:id', async (req, res) => {
 });
 
 // this endpoint is for disliking the post
-router.patch('/dislike/:id', async (req, res) =>{
+router.patch('/dislike/:id',verifyToken, async (req, res) =>{
   try{
     const id = req.params.id;
     const dislikedPost = await postModel.findOneAndUpdate(
@@ -161,7 +161,7 @@ router.patch('/dislike/:id', async (req, res) =>{
 
 // this endpoint is for commenting on a
 // partricular post by the user
-router.post('/comment/:postid', async (req, res) =>{
+router.post('/comment/:postid',verifyToken, async (req, res) =>{
   try{
     const postId = req.params.postid;
     const comment = new commentModel({
@@ -195,7 +195,7 @@ router.post('/comment/:postid', async (req, res) =>{
 
 // this endpoint is to get all the comments of
 // the a partiicular post with id postid
-router.get('/getcomment/:postid', async (req, res) =>{
+router.get('/getcomment/:postid',verifyToken, async (req, res) =>{
   try{
     const postid = req.params.postid;
     console.log(postid);
@@ -217,6 +217,23 @@ router.get('/getcomment/:postid', async (req, res) =>{
       message:'Something went wrong'
     });
   }
+});
+
+// this endpoint gives all the post of the 
+// user that is logged in
+router.get('/mydashboard', verifyToken, async (req, res) =>{
+  const user = await userModel.findOne({
+    _id:req.user._id
+  });
+  if (!user) {
+    return res.status(400).json({
+      message:'Something went wrong'
+    });
+  }
+  const postsUser = user.posts;
+  return res.status(200).json({
+    message:postsUser
+  });
 });
 
 module.exports = router;

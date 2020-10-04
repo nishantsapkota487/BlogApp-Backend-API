@@ -7,11 +7,15 @@ const userSchema = require('./models/user');
 
 const app = express();
 dotenv.config();
+
+app.use(cors({
+  origin:process.env.ORIGIN
+}));
 app.use(express.json());
 
 app.listen(process.env.PORT, (req, res)=>{
   console.log("listening on port", process.env.PORT);
-})
+});
 
 mongoose.connect(process.env.DB_CONNECT,
    { useUnifiedTopology: true,
@@ -21,5 +25,10 @@ mongoose.connect(process.env.DB_CONNECT,
   console.log('DB Connected');
 });
 
+// this api endpoint is for all
+// the blogs
 app.use('/api/blogs', postRouter);
+
+// this api endpoint is for all
+// the usrs
 app.use('/api/user', userRouter);

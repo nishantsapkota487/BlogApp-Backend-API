@@ -2,22 +2,31 @@ const express = require('express');
 const mongoose = require('mongoose');
 const postModel = require('../models/postmodel');
 const commentModel = require('../models/comment');
+const userModel = require('../models/user');
+const verifyToken = require('../middlewares/auth');
 const router = express.Router();
 
 mongoose.set('useFindAndModify', false);
 // this endpoint is for creating
 // the post
-router.post('/create', async (req, res)=>{
+router.post('/create',verifyToken, async (req, res)=>{
   const title = req.body.title;
   const content = req.body.content;
   const post = new postModel({
     title:title,
     content:content,
     likes:0,
-    dislikes:0
+    dislikes:0,
+    creator:req.user._id
   });
   try{
     const savedPost = await post.save()
+    const updateUser = await userModel.findOneAndUpdate(
+      {_id:req.user._id},
+      {$push:{
+        posts:post
+      }}
+    );
     if (savedPost) {
       return res.status(200).json({
         message:savedPost
@@ -36,9 +45,9 @@ router.post('/create', async (req, res)=>{
 
 // this endpoint is for retrieving all the
 // posts created by the user
-router.get('/posts', async (req, res) =>{
+router.get('/posts',verifyToken, async (req, res) =>{
   try{
-    const posts = await postModel.find({});
+    const posts = await postModel.find({_id:req.user._id});
     if (posts) {
       return res.status(200).json({
         message:posts
@@ -180,6 +189,32 @@ router.post('/comment/:postid', async (req, res) =>{
   }catch(err){
     return res.status(400).json({
       message:err
+    });
+  }
+});
+
+// this endpoint is to get all the comments of
+// the a partiicular post with id postid
+router.get('/getcomment/:postid', async (req, res) =>{
+  try{
+    const postid = req.params.postid;
+    console.log(postid);
+    const post = await postModel.findOne({
+      _id:postid
+    });
+    console.log(post);
+    if (!post) {
+      return res.status(400).json({
+        message:'Something went wrong'
+      });
+    }
+    return res.status(200).json({
+      message:post.comment
+    })
+  }catch(err){
+    console.log(err);
+    return res.status(400).json({
+      message:'Something went wrong'
     });
   }
 });

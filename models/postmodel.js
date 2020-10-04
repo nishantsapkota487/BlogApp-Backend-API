@@ -22,9 +22,8 @@ const posts = schema({
     default:Date.now
   },
   creator:{
-    type:String,
+    type:schema.Types.ObjectId,
     required:true,
-    default:'Nishant'
   },
   likes:{
     type:Number,

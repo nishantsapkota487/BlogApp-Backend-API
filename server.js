@@ -10,9 +10,7 @@ const app = express();
 dotenv.config();
 
 app.use(express.json());
-app.use(cors({
-  origin:process.env.ORIGIN
-}));
+app.use(cors());
 app.get('/test', (req, res)=>{
   res.json({
     message:"this is test"

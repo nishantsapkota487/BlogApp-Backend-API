@@ -6,9 +6,9 @@ const express = require('express');
 // this allows us to verify token received
 // from the backend
 const verify = async (req, res, next) => {
-  const token = req.header('auth-token');
+  const token = req.header('auth_token');
   if (!token) {
-    return res.status(401).json({
+    return res.status(402).json({
       message:'Access denied'
     });
   }

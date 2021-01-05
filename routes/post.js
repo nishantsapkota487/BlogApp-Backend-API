@@ -48,9 +48,11 @@ router.post('/create',verifyToken, async (req, res)=>{
 router.get('/posts',verifyToken, async (req, res) =>{
   try{
     const posts = await postModel.find({});
+    const user = await userModel.findOne({_id:req.user._id});
     if (posts) {
       return res.status(200).json({
-        message:posts
+        message:posts,
+        user: user.username
       })
     }else{
       return res.status(404).json({
@@ -70,6 +72,8 @@ router.get('/posts',verifyToken, async (req, res) =>{
 router.delete('/delete/:id',verifyToken, async (req, res)=>{
   const id = req.params.id;
   try{
+    const userId = req.user._id;
+    const user = await userModel.findOne({_id:id});
     const post = await postModel.find({
       _id:id
     });
@@ -81,7 +85,6 @@ router.delete('/delete/:id',verifyToken, async (req, res)=>{
       try{
         for (var i = 0; i < comments.length; i++) {
           const comment = await commentModel.findOne({_id:comments[i]})
-          console.log(comment);
           comment.delete()
         }
       }catch(err){
@@ -197,19 +200,23 @@ router.post('/comment/:postid',verifyToken, async (req, res) =>{
 // the a partiicular post with id postid
 router.get('/getcomment/:postid',verifyToken, async (req, res) =>{
   try{
+    const finalComment = []
     const postid = req.params.postid;
-    console.log(postid);
     const post = await postModel.findOne({
       _id:postid
     });
-    console.log(post);
     if (!post) {
       return res.status(400).json({
         message:'Something went wrong'
       });
     }
+    const comments = post.comment
+    for (var i = 0; i < comments.length; i++) {
+      const realComment = await commentModel.findOne({_id:comments[i]})
+      finalComment.push(realComment.comment)
+    }
     return res.status(200).json({
-      message:post.comment
+      message:finalComment
     })
   }catch(err){
     console.log(err);
@@ -219,9 +226,10 @@ router.get('/getcomment/:postid',verifyToken, async (req, res) =>{
   }
 });
 
-// this endpoint gives all the post of the 
+// this endpoint gives all the post of the
 // user that is logged in
 router.get('/mydashboard', verifyToken, async (req, res) =>{
+  const realPosts = []
   const user = await userModel.findOne({
     _id:req.user._id
   });
@@ -231,8 +239,12 @@ router.get('/mydashboard', verifyToken, async (req, res) =>{
     });
   }
   const postsUser = user.posts;
+  for (var i = 0; i < postsUser.length; i++) {
+    let finalPost = await postModel.findOne({_id:postsUser[i]});
+    realPosts.push(finalPost);
+  }
   return res.status(200).json({
-    message:postsUser
+    message:realPosts
   });
 });
 

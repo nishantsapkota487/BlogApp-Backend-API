@@ -12,7 +12,7 @@ const router = express.Router();
 router.post('/register', async (req, res) =>{
   const { error }  = registerValidate(req.body);
   if (error) {
-    return res.status(400).json({
+    return res.json({
       message:'Registration failed'
     });
   }
@@ -71,7 +71,6 @@ router.post('/login',  async (req, res) =>{
     const user = await userModel.findOne({
       email:email
     });
-    console.log(user);
     if (!user) {
       return res.json({
         message:'User does not exist'
@@ -81,7 +80,7 @@ router.post('/login',  async (req, res) =>{
     // correct password or not
     const passCheck = await bcrypt.compare(password, user.password);
     if (!passCheck) {
-      return res.status(400).json({
+      return res.json({
         message:'Enter correct credential'
       })
     }
@@ -94,7 +93,7 @@ router.post('/login',  async (req, res) =>{
       },
       process.env.SECRET
     );
-    return res.header('auth-token', token).json({
+    return res.header('auth_token', token).json({
       message:token
     });
   }catch(err){
